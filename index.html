@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPE 토론 및 발표 일지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f8; --paper:#fff; --ink:#1f2933; --muted:#616e7c; --line:#cbd2d9;
+  --head:#eef2f7; --accent:#2f5d8a; --accent-soft:#e3ecf5; --ok:#2e7d4f; --warn:#b4471f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:15px;line-height:1.55}
+.toolbar{position:sticky;top:0;z-index:10;background:var(--accent);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar .title{font-weight:700;margin-right:auto}
+.toolbar button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:6px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+.toolbar button:hover{background:rgba(255,255,255,.15)}
+.toolbar button.primary{background:#fff;color:var(--accent);border-color:#fff;font-weight:700}
+#saveState{font-size:12px;opacity:.85;width:100%;text-align:right}
+.paper{max-width:900px;margin:20px auto 60px;background:var(--paper);padding:40px 44px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+h1{text-align:center;font-size:20px;margin:0 0 2px;color:var(--accent)}
+h2.sub{text-align:center;font-size:24px;margin:0 0 26px;letter-spacing:4px}
+table{width:100%;border-collapse:collapse;margin-bottom:18px;table-layout:fixed}
+th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:middle}
+th{background:var(--head);font-weight:700;font-size:14px;text-align:center}
+input[type=text],input[type=date],input[type=number],textarea{width:100%;border:1px solid transparent;background:transparent;font:inherit;color:inherit;padding:5px 6px;border-radius:4px}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);background:#fafcff}
+textarea{resize:vertical;min-height:110px;border-color:var(--line)}
+textarea.autogrow{min-height:38px;resize:none;overflow:hidden;line-height:1.5;display:block}
+textarea.autogrow.big{min-height:150px}
+textarea.autogrow.mid{min-height:80px}
+td textarea.autogrow{border-color:transparent;min-height:34px}
+td textarea.autogrow:focus{border-color:var(--accent)}
+select{width:100%;border:1px solid var(--line);border-radius:4px;padding:5px 6px;font:inherit;color:inherit;background:#fff}
+.list-rows .row{display:flex;gap:6px;align-items:flex-start;margin-bottom:4px}
+.list-rows .row textarea{border:1px solid var(--line);min-height:34px}
+.list-rows .row .dept{flex:0 0 140px}
+.list-rows .row .sid{flex:0 0 110px}
+.list-rows .row .name{flex:0 0 110px}
+.list-rows .row .reason{flex:1}
+.btn-mini{border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;font-size:13px;padding:3px 9px;color:var(--muted)}
+.btn-mini:hover{border-color:var(--accent);color:var(--accent)}
+.btn-del{border:none;background:none;color:#9aa5b1;cursor:pointer;font-size:16px;padding:0 4px}
+.btn-del:hover{color:var(--warn)}
+.sum{font-size:13px;margin-top:6px;text-align:right}
+.sum.ok{color:var(--ok)} .sum.bad{color:var(--warn);font-weight:700}
+section.part{margin-top:30px}
+section.part h3{font-size:17px;margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.guide{color:var(--muted);font-size:13px;margin:6px 0 10px;padding-left:14px}
+.guide li{margin:2px 0}
+.opinion{border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:8px}
+.opinion .top{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.opinion .top textarea{border:1px solid var(--line);flex:0 0 200px;min-height:34px}
+
+.label{font-size:13px;font-weight:700;margin:10px 0 4px}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.photo{border:1px solid var(--line);border-radius:6px;padding:8px;position:relative}
+.photo img{width:100%;display:block;border-radius:4px}
+.photo textarea{border:1px solid var(--line);margin-top:6px;font-size:13px;min-height:32px}
+.photo .btn-del{position:absolute;top:4px;right:4px;background:#fff;border-radius:50%}
+.drop{border:2px dashed var(--line);border-radius:8px;padding:22px;text-align:center;color:var(--muted);cursor:pointer;margin-bottom:12px}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.notice{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;font-size:13px;border-radius:4px;margin-bottom:22px}
+.checklist{margin-top:30px;padding:14px 18px;border:1px solid var(--line);border-radius:6px;background:#fbfcfd}
+.checklist h4{margin:0 0 8px;font-size:15px}
+.checklist ul{margin:0;padding-left:18px;font-size:14px}
+.checklist li.ok{color:var(--ok)} .checklist li.bad{color:var(--warn)}
+.print-only{display:none}
+@media (max-width:640px){
+  .paper{padding:22px 16px;margin:10px 0}
+  .list-rows .row{flex-wrap:wrap}
+  .list-rows .row .dept,.list-rows .row .sid,.list-rows .row .name{flex:1 1 40%}
+  th,td{padding:4px}
+}
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff;font-size:11pt}
+  .toolbar,.no-print,.btn-del,.btn-mini,.drop,.checklist,.notice{display:none!important}
+  .paper{box-shadow:none;margin:0;padding:0;max-width:none}
+  .print-hide{display:none!important}
+  ::placeholder{color:transparent!important}
+  input::-webkit-calendar-picker-indicator{display:none}
+  .print-only{display:block;white-space:pre-wrap;word-break:break-word;min-height:1em}
+  .print-hide{display:none!important}
+  .print-only.inline{min-height:0;padding:2px 6px}
+  .print-only.box{padding:4px 6px}
+  .list-rows .row{flex-wrap:wrap}
+  .photo .print-only{font-size:10pt;margin-top:4px}
+  section.part{break-inside:auto}
+  .photo{break-inside:avoid}
+  .opinion{break-inside:avoid}
+  th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="title">IPE 토론 및 발표 일지</span>
+  <button type="button" id="btnCheck">제출 전 점검</button>
+  <button type="button" id="btnWord">Word로 저장</button>
+  <button type="button" id="btnJson">작성본 백업</button>
+  <button type="button" id="btnLoad">백업 불러오기</button>
+  <button type="button" id="btnReset">초기화</button>
+  <button type="button" class="primary" id="btnPrint">인쇄 / PDF</button>
+  <span id="saveState">입력 내용은 이 브라우저에 자동 저장됩니다.</span>
+  <input type="file" id="jsonFile" accept=".json" hidden>
+</div>
+
+<div class="paper" id="doc">
+  <h1>보건의료전문직간 협업 리더십(IPE) <span id="hClass">07</span>분반</h1>
+  <h2 class="sub">토론 및 발표 일지</h2>
+
+  <div class="notice no-print">
+    작성 후 <b>제출 전 점검</b>으로 누락 항목과 기여도 합계(100%)를 확인하세요. 제출은 <b>인쇄 / PDF</b>(PDF로 저장) 또는 <b>Word로 저장</b>을 이용합니다.
+  </div>
+
+  <!-- 기본 정보 -->
+  <table>
+    <colgroup><col style="width:12%"><col style="width:20%"><col style="width:12%"><col style="width:22%"><col style="width:13%"><col style="width:21%"></colgroup>
+    <tr>
+      <th>분반</th><td><select data-k="cls"><option value="01">01분반</option><option value="02">02분반</option><option value="03">03분반</option><option value="04">04분반</option><option value="05">05분반</option><option value="06">06분반</option><option value="07" selected>07분반</option><option value="08">08분반</option><option value="09">09분반</option><option value="10">10분반</option></select></td>
+      <th>조명</th><td><textarea class="autogrow" data-k="team" rows="1" placeholder="예: 3조"></textarea></td>
+      <th>수업 날짜</th><td><input type="date" data-k="date"></td>
+    </tr>
+  </table>
+
+  <!-- 출결 및 기여도 -->
+  <table>
+    <colgroup><col style="width:22%"><col></colgroup>
+    <tr>
+      <th>출석자 명단<br>(소속 학과, 학번, 이름)</th>
+      <td>
+        <div class="list-rows" id="present"></div>
+        <button type="button" class="btn-mini" data-add="present">+ 출석자 추가</button>
+      </td>
+    </tr>
+    <tr>
+      <th>결석자 명단<br>(학과 및 이름)<br>및 결석 사유</th>
+      <td>
+        <div class="list-rows" id="absent"></div>
+        <button type="button" class="btn-mini" data-add="absent">+ 결석자 추가</button>
+      </td>
+    </tr>
+    <tr>
+      <th>수업 제목 또는 주제</th>
+      <td><textarea class="autogrow" data-k="lectureTitle" rows="2" placeholder="수업 제목 또는 발표 주제 (줄바꿈 가능, 입력 길이에 맞춰 칸이 늘어납니다)"></textarea></td>
+    </tr>
+  </table>
+
+  <table id="contribTable">
+    <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col><col style="width:30px" class="print-hide"></colgroup>
+    <tbody id="contrib"></tbody>
+  </table>
+  <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-top:-12px;margin-bottom:18px">
+    <span>
+      <button type="button" class="btn-mini" id="addContrib">+ 행 추가</button>
+      <button type="button" class="btn-mini" id="fillFromPresent">출석자 이름 불러오기</button>
+      <button type="button" class="btn-mini" id="evenSplit">균등 배분</button>
+    </span>
+    <span class="sum" id="sum">합계 0%</span>
+  </div>
+
+  <!-- 1 -->
+  <section class="part">
+    <h3>1. 수업 또는 주제발표 내용 요약</h3>
+    <ul class="guide no-print"><li>교수자 또는 학생 주제 발표 내용을 요약 작성</li></ul>
+    <textarea class="autogrow big" data-k="summary" rows="8" placeholder="발표자, 핵심 내용, 주요 개념 등을 요약하세요."></textarea>
+  </section>
+
+  <!-- 2 -->
+  <section class="part">
+    <h3>2. 조별 토론 내용</h3>
+    <ul class="guide no-print"><li>토론 주제</li><li>토론 학생 실명 기재 및 학생별 의견 작성</li></ul>
+    <div class="label">토론 주제</div>
+    <textarea class="autogrow" data-k="discTopic" rows="1" placeholder="조별 토론 주제 (줄바꿈 가능)"></textarea>
+    <div class="label">학생별 의견</div>
+    <div id="opinions"></div>
+    <div class="no-print">
+      <button type="button" class="btn-mini" id="addOpinion">+ 의견 추가</button>
+      <button type="button" class="btn-mini" id="opinionFromPresent">출석자별 의견란 만들기</button>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="part">
+    <h3>3. 결론 및 요약</h3>
+    <ul class="guide no-print"><li>발표 및 토론내용에 대한 종합(또는 합의)된 내용을 요약합니다.</li></ul>
+    <textarea class="autogrow big" data-k="conclusion" rows="7" placeholder="토론을 통해 합의된 내용, 협업 관점의 시사점 등을 정리하세요."></textarea>
+  </section>
+
+  <!-- 4 -->
+  <section class="part">
+    <h3>4. 조별 토론 사진 자료 첨부</h3>
+    <div class="drop no-print" id="drop">사진을 끌어 놓거나 클릭하여 선택 (여러 장 가능, 자동 축소 저장)</div>
+    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+    <div class="photos" id="photos"></div>
+  </section>
+
+  <div class="checklist no-print" id="checklist" hidden>
+    <h4>제출 전 점검 결과</h4>
+    <ul id="checkList"></ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = 'ipe07_discussion_log_v1';
+  var state = {fields:{}, present:[], absent:[], contrib:[], opinions:[], photos:[]};
+  var $ = function(s,r){return (r||document).querySelector(s)};
+  var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+  /* ---------- 저장 ---------- */
+  var timer;
+  function save(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      try{
+        localStorage.setItem(KEY, JSON.stringify(state));
+        $('#saveState').textContent = '자동 저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      }catch(e){
+        $('#saveState').textContent = '⚠ 브라우저 저장 공간 부족(사진 용량) — "작성본 백업"으로 파일 저장을 권장합니다.';
+      }
+    }, 400);
+  }
+  function load(){
+    try{ var s = localStorage.getItem(KEY); if(s) state = Object.assign(state, JSON.parse(s)); }catch(e){}
+  }
+
+  /* ---------- 단일 필드 ---------- */
+  function grow(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
+  function growAll(){$$('textarea.autogrow').forEach(grow)}
+  window.addEventListener('resize',growAll);
+  function bindFields(){
+    $$('[data-k]').forEach(function(el){
+      var k = el.getAttribute('data-k');
+      if(state.fields[k] !== undefined) el.value = state.fields[k];
+      else state.fields[k] = el.value;
+      var h = function(){
+        state.fields[k] = el.value;
+        if(el.classList.contains('autogrow')) grow(el);
+        if(k==='cls') $('#hClass').textContent = el.value || '07';
+        save();
+      };
+      el.addEventListener('input', h); el.addEventListener('change', h);
+    });
+    if(!state.fields.date){
+      var d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+      state.fields.date = d.toISOString().slice(0,10);
+      $('[data-k=date]').value = state.fields.date;
+    }
+    $('#hClass').textContent = state.fields.cls || '07';
+    growAll();
+  }
+
+  /* ---------- 출석/결석 ---------- */
+  function renderList(which){
+    var box = $('#'+which); box.innerHTML='';
+    state[which].forEach(function(p,i){
+      var row = document.createElement('div'); row.className='row';
+      var fields = which==='present'
+        ? [['dept','소속 학과'],['sid','학번'],['name','이름']]
+        : [['dept','학과'],['name','이름'],['reason','결석 사유']];
+      row.innerHTML = fields.map(function(f){return '<textarea class="autogrow '+f[0]+'" rows="1" placeholder="'+f[1]+'">'+esc(p[f[0]])+'</textarea>'}).join('')+
+        '<button type="button" class="btn-del" title="삭제">×</button>';
+      row.querySelectorAll('textarea').forEach(function(inp,j){var key=fields[j][0];inp.oninput=function(){p[key]=this.value;grow(this);save()}});
+      row.querySelector('.btn-del').onclick=function(){state[which].splice(i,1);renderList(which);save()};
+      box.appendChild(row);
+    });
+  }
+  $$('[data-add]').forEach(function(b){
+    b.onclick=function(){var w=b.getAttribute('data-add');state[w].push({dept:'',sid:'',name:'',reason:''});renderList(w);save();
+      var r=$$('#'+w+' .row');r[r.length-1].querySelector('textarea').focus();};
+  });
+
+  /* ---------- 기여도 ---------- */
+  function renderContrib(){
+    var tb = $('#contrib');
+    tb.innerHTML='<tr><th rowspan="'+(state.contrib.length+1)+'">토론 및 학습일지<br>참여 학생별<br>기여도</th>'+
+      '<th>학생명</th><th>기여도(%)</th><th>기여도 산출 근거 요약</th><th class="print-hide"></th></tr>';
+    state.contrib.forEach(function(c,i){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><textarea class="autogrow" rows="1" placeholder="이름">'+esc(c.name)+'</textarea></td>'+
+        '<td><input type="number" min="0" max="100" step="1" style="text-align:center" value="'+esc(c.pct)+'"></td>'+
+        '<td><textarea class="autogrow" rows="1" placeholder="예: 자료 조사, 발표, 일지 정리">'+esc(c.basis)+'</textarea></td>'+
+        '<td class="print-hide" style="text-align:center"><button type="button" class="btn-del" title="삭제">×</button></td>';
+      var tas=tr.querySelectorAll('textarea');
+      tas[0].oninput=function(){c.name=this.value;grow(this);save()};
+      tr.querySelector('input').oninput=function(){c.pct=this.value;updateSum();save()};
+      tas[1].oninput=function(){c.basis=this.value;grow(this);save()};
+      tr.querySelector('.btn-del').onclick=function(){state.contrib.splice(i,1);renderContrib();save()};
+      tb.appendChild(tr);
+    });
+    growAll(); updateSum();
+  }
+  function sumPct(){return state.contrib.reduce(function(a,c){return a+(parseFloat(c.pct)||0)},0)}
+  function updateSum(){
+    var s=Math.round(sumPct()*10)/10, el=$('#sum');
+    el.textContent='합계 '+s+'%'+(s===100?' ✓':' (100%가 되어야 합니다)');
+    el.className='sum '+(s===100?'ok':'bad');
+  }
+  $('#addContrib').onclick=function(){state.contrib.push({name:'',pct:'',basis:''});renderContrib();save()};
+  function presentNames(){return state.present.map(function(p){return (p.name||'').trim()}).filter(Boolean)}
+  $('#fillFromPresent').onclick=function(){
+    var names=presentNames(); if(!names.length){alert('출석자 명단을 먼저 입력하세요.');return}
+    var have=state.contrib.map(function(c){return c.name.trim()});
+    state.contrib=state.contrib.filter(function(c){return c.name.trim()||c.pct||c.basis});
+    names.forEach(function(n){if(have.indexOf(n)<0) state.contrib.push({name:n,pct:'',basis:''})});
+    renderContrib();save();
+  };
+  $('#evenSplit').onclick=function(){
+    var rows=state.contrib.filter(function(c){return c.name.trim()}); if(!rows.length) return;
+    var base=Math.floor(100/rows.length), rest=100-base*rows.length;
+    rows.forEach(function(c,i){c.pct=String(base+(i<rest?1:0))});
+    renderContrib();save();
+  };
+
+  /* ---------- 학생별 의견 ---------- */
+  function renderOpinions(){
+    var box=$('#opinions'); box.innerHTML='';
+    state.opinions.forEach(function(o,i){
+      var d=document.createElement('div'); d.className='opinion';
+      d.innerHTML='<div class="top"><textarea class="autogrow" rows="1" placeholder="학생 실명">'+esc(o.name)+'</textarea>'+
+        '<span style="flex:1"></span><button type="button" class="btn-del" title="삭제">×</button></div>'+
+        '<textarea class="autogrow mid" placeholder="해당 학생의 의견 (전공 관점, 근거, 다른 직종과의 협업 제안 등)">'+esc(o.text)+'</textarea>';
+      var ot=d.querySelectorAll('textarea');
+      ot[0].oninput=function(){o.name=this.value;grow(this);save()};
+      ot[1].oninput=function(){o.text=this.value;grow(this);save()};
+      d.querySelector('.btn-del').onclick=function(){state.opinions.splice(i,1);renderOpinions();save()};
+      box.appendChild(d);
+    });
+    growAll();
+  }
+  $('#addOpinion').onclick=function(){state.opinions.push({name:'',text:''});renderOpinions();save()};
+  $('#opinionFromPresent').onclick=function(){
+    var names=presentNames(); if(!names.length){alert('출석자 명단을 먼저 입력하세요.');return}
+    var have=state.opinions.map(function(o){return o.name.trim()});
+    names.forEach(function(n){if(have.indexOf(n)<0) state.opinions.push({name:n,text:''})});
+    renderOpinions();save();
+  };
+
+  /* ---------- 사진 ---------- */
+  function renderPhotos(){
+    var box=$('#photos'); box.innerHTML='';
+    state.photos.forEach(function(p,i){
+      var d=document.createElement('div'); d.className='photo';
+      d.innerHTML='<img alt="토론 사진 '+(i+1)+'" src="'+p.src+'"><button type="button" class="btn-del" title="삭제">×</button>'+
+        '<textarea class="autogrow" rows="1" placeholder="사진 설명 (선택)">'+esc(p.cap)+'</textarea>';
+      d.querySelector('textarea').oninput=function(){p.cap=this.value;grow(this);save()};
+      d.querySelector('.btn-del').onclick=function(){state.photos.splice(i,1);renderPhotos();save()};
+      box.appendChild(d);
+    });
+    growAll();
+  }
+  function addFiles(files){
+    Array.prototype.forEach.call(files,function(f){
+      if(!/^image\//.test(f.type)) return;
+      var r=new FileReader();
+      r.onload=function(){
+        var img=new Image();
+        img.onload=function(){
+          var max=1200, w=img.width, h=img.height, s=Math.min(1,max/Math.max(w,h));
+          var c=document.createElement('canvas'); c.width=Math.round(w*s); c.height=Math.round(h*s);
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          state.photos.push({src:c.toDataURL('image/jpeg',0.72),cap:''});
+          renderPhotos();save();
+        };
+        img.src=r.result;
+      };
+      r.readAsDataURL(f);
+    });
+  }
+  var drop=$('#drop'), pin=$('#photoInput');
+  drop.onclick=function(){pin.click()};
+  pin.onchange=function(){addFiles(pin.files);pin.value=''};
+  ['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(e){addFiles(e.dataTransfer.files)});
+
+  /* ---------- 점검 ---------- */
+  function runCheck(){
+    var f=state.fields, items=[];
+    function chk(ok,msg){items.push({ok:ok,msg:msg})}
+    chk(!!(f.team||'').trim(),'조명');
+    chk(!!f.date,'수업 날짜');
+    chk(state.present.some(function(p){return (p.name||'').trim()}) && state.present.every(function(p){return !(p.name||p.sid||p.dept)||((p.dept||'').trim()&&(p.sid||'').trim()&&(p.name||'').trim())}),'출석자 명단(소속 학과·학번·이름 모두 기재)');
+    chk(state.absent.every(function(p){return !(p.name||p.dept||p.reason)||((p.dept||'').trim()&&(p.name||'').trim()&&(p.reason||'').trim())}),'결석자 학과·이름·결석 사유');
+    chk(!!(f.lectureTitle||'').trim(),'수업 제목 또는 주제');
+    var s=Math.round(sumPct()*10)/10;
+    chk(state.contrib.length>0 && s===100,'학생별 기여도 합계 100% (현재 '+s+'%)');
+    chk(state.contrib.length>0 && state.contrib.every(function(c){return (c.basis||'').trim()}),'기여도 산출 근거');
+    var names=presentNames(), cn=state.contrib.map(function(c){return c.name.trim()});
+    var miss=names.filter(function(n){return cn.indexOf(n)<0});
+    chk(miss.length===0,'출석자 전원 기여도 기재'+(miss.length?' (누락: '+miss.join(', ')+')':''));
+    chk(!!(f.summary||'').trim(),'1. 수업/주제발표 내용 요약');
+    chk(!!(f.discTopic||'').trim(),'2. 토론 주제');
+    chk(state.opinions.some(function(o){return o.name.trim()&&o.text.trim()}),'2. 학생별 의견(실명)');
+    chk(!!(f.conclusion||'').trim(),'3. 결론 및 요약');
+    chk(state.photos.length>0,'4. 토론 사진 첨부');
+    $('#checkList').innerHTML=items.map(function(it){return '<li class="'+(it.ok?'ok':'bad')+'">'+(it.ok?'✓ ':'✗ ')+esc(it.msg)+'</li>'}).join('');
+    $('#checklist').hidden=false;
+    $('#checklist').scrollIntoView({behavior:'smooth',block:'center'});
+    return items.every(function(i){return i.ok});
+  }
+  $('#btnCheck').onclick=runCheck;
+
+  /* ---------- 인쇄 ---------- */
+  function fmtDate(v){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');return m?m[1]+'. '+m[2]+'. '+m[3]+'.':(v||'')}
+  function syncPrint(){
+    $$('.print-only').forEach(function(n){n.remove()});
+    $$('#doc textarea, #doc input[type=text], #doc input[type=number], #doc input[type=date], #doc select').forEach(function(el){
+      if(el.closest('.no-print')) return;
+      var v = el.tagName==='SELECT' ? el.options[el.selectedIndex].text : (el.type==='date' ? fmtDate(el.value) : el.value);
+      var d=document.createElement('div');
+      var extra=(el.className||'').replace(/autogrow|big|mid/g,'').trim();
+      d.className='print-only '+(el.tagName==='TEXTAREA' && /big|mid/.test(el.className)?'box ':'inline ')+extra;
+      if(el.type==='number') d.style.textAlign='center';
+      d.textContent=v;
+      el.classList.add('print-hide');
+      el.after(d);
+    });
+  }
+  function unsyncPrint(){
+    $$('.print-only').forEach(function(n){n.remove()});
+    $$('#doc .print-hide').forEach(function(el){ if(/^(TEXTAREA|INPUT|SELECT)$/.test(el.tagName)) el.classList.remove('print-hide') });
+    growAll();
+  }
+  window.addEventListener('beforeprint',syncPrint);
+  window.addEventListener('afterprint',unsyncPrint);
+  $('#btnPrint').onclick=function(){
+    if(!runCheck() && !confirm('누락된 항목이 있습니다. 그래도 인쇄하시겠습니까?')) return;
+    window.print();
+  };
+
+  /* ---------- Word 저장 ---------- */
+  function fname(ext){
+    var f=state.fields; return ['IPE'+(f.cls||'07')+'분반',f.team||'조',f.date||''].join('_').replace(/[\\/:*?"<>|\s]/g,'')+'.'+ext;
+  }
+  function nl(s){return esc(s).replace(/\n/g,'<br>')}
+  $('#btnWord').onclick=function(){
+    var f=state.fields, td='border:1px solid #888;padding:5px;', th=td+'background:#eef2f7;font-weight:bold;text-align:center;';
+    var pres=state.present.filter(function(p){return p.name||p.sid}).map(function(p){return esc(p.dept)+' '+esc(p.sid)+' '+esc(p.name)}).join('<br>');
+    var abs=state.absent.filter(function(p){return p.name}).map(function(p){return esc(p.dept)+' '+esc(p.name)+(p.reason?' ('+esc(p.reason)+')':'')}).join('<br>');
+    var rows=state.contrib.map(function(c){return '<tr><td style="'+td+'"></td><td style="'+td+'">'+esc(c.name)+'</td><td style="'+td+'text-align:center">'+esc(c.pct)+'</td><td style="'+td+'">'+nl(c.basis)+'</td></tr>'}).join('');
+    var ops=state.opinions.map(function(o){return '<p><b>'+esc(o.name)+'</b><br>'+nl(o.text)+'</p>'}).join('');
+    var pics=state.photos.map(function(p){return '<p><img src="'+p.src+'" width="420"><br>'+nl(p.cap)+'</p>'}).join('');
+    var html='<html><head><meta charset="utf-8"></head><body style="font-family:\'맑은 고딕\';font-size:10.5pt">'+
+      '<p style="text-align:center;font-size:13pt"><b>보건의료전문직간 협업 리더십(IPE) '+esc(f.cls||'07')+'분반</b></p>'+
+      '<p style="text-align:center;font-size:16pt"><b>토론 및 발표 일지</b></p>'+
+      '<table style="border-collapse:collapse;width:100%"><tr><td style="'+th+'">분반</td><td style="'+td+'">'+esc(f.cls)+'</td><td style="'+th+'">조명</td><td style="'+td+'">'+esc(f.team)+'</td><td style="'+th+'">수업 날짜</td><td style="'+td+'">'+esc(f.date)+'</td></tr></table><br>'+
+      '<table style="border-collapse:collapse;width:100%">'+
+      '<tr><td style="'+th+'width:22%">출석자 명단(소속 학과, 학번, 이름)</td><td colspan="3" style="'+td+'">'+pres+'</td></tr>'+
+      '<tr><td style="'+th+'">결석자 명단(학과 및 이름) 및 결석 사유</td><td colspan="3" style="'+td+'">'+abs+'</td></tr>'+
+      '<tr><td style="'+th+'">수업 제목 또는 주제</td><td colspan="3" style="'+td+'">'+nl(f.lectureTitle)+'</td></tr>'+
+      '<tr><td style="'+th+'">토론 및 학습일지 참여 학생별 기여도</td><td style="'+th+'">학생명</td><td style="'+th+'">기여도(%)</td><td style="'+th+'">기여도 산출 근거 요약</td></tr>'+
+      rows+
+      '</table>'+
+      '<h3>1. 수업 또는 주제발표 내용 요약</h3><p>'+nl(f.summary)+'</p>'+
+      '<h3>2. 조별 토론 내용</h3><p><b>토론 주제:</b> '+nl(f.discTopic)+'</p>'+ops+
+      '<h3>3. 결론 및 요약</h3><p>'+nl(f.conclusion)+'</p>'+
+      '<h3>4. 조별 토론 사진 자료 첨부</h3>'+pics+'</body></html>';
+    download(new Blob(['﻿'+html],{type:'application/msword'}),fname('doc'));
+  };
+
+  /* ---------- 백업 ---------- */
+  function download(blob,name){
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+  }
+  $('#btnJson').onclick=function(){download(new Blob([JSON.stringify(state)],{type:'application/json'}),fname('json'))};
+  $('#btnLoad').onclick=function(){$('#jsonFile').click()};
+  $('#jsonFile').onchange=function(){
+    var file=this.files[0]; if(!file) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{ var d=JSON.parse(r.result); if(!d.fields) throw 0;
+        state=Object.assign({fields:{},present:[],absent:[],contrib:[],opinions:[],photos:[]},d);
+        $$('[data-k]').forEach(function(el){el.value=state.fields[el.getAttribute('data-k')]||(el.tagName==='SELECT'?'07':'')});growAll();
+        renderAll(); save();
+      }catch(e){alert('올바른 백업 파일이 아닙니다.')}
+    };
+    r.readAsText(file); this.value='';
+  };
+  $('#btnReset').onclick=function(){
+    if(!confirm('작성한 모든 내용을 지웁니다. 계속할까요?')) return;
+    try{localStorage.removeItem(KEY)}catch(e){}
+    location.reload();
+  };
+
+  function renderAll(){
+    $('#hClass').textContent=state.fields.cls||'07';
+    renderList('present'); renderList('absent'); renderContrib(); renderOpinions(); renderPhotos();
+  }
+
+  /* ---------- 초기화 ---------- */
+  load();
+  if(!state.present.length) state.present=[0,1,2].map(function(){return {dept:'',sid:'',name:''}});
+  if(!state.contrib.length) for(var i=0;i<7;i++) state.contrib.push({name:'',pct:'',basis:''});
+  if(!state.opinions.length) state.opinions=[{name:'',text:''},{name:'',text:''}];
+  bindFields(); renderAll();
+})();
+</script>
+</body>
+</html>
