@@ -8,7 +8,7 @@ import atexit, os, sys, shutil, argparse
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-LOCAL_REPO = r"C:\workspace\IPE-Report"
+LOCAL_REPO = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_DEST = "G:\\내 드라이브\\강의\\02_IPE\\.deploy_ipe_report"
 
 def resolve_gdrive_dest():

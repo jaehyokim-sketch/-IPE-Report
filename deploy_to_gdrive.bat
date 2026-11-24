@@ -11,7 +11,7 @@ if not defined GDRIVE_TARGET if exist "D:\강의\02_IPE\.deploy_ipe_report" set 
 if not defined GDRIVE_TARGET set "GDRIVE_TARGET=D:\강의\02_IPE\.deploy_ipe_report"
 
 echo [배포 대상] %GDRIVE_TARGET%
-robocopy "C:\workspace\IPE-Report" "%GDRIVE_TARGET%" /E /XD .git __pycache__ .pytest_cache node_modules .venv .vscode .idea /XF *.pyc *.pyo *.lock *.tmp *.swp *.bak ~$* /R:2 /W:2 /NP /NFL /NDL
+robocopy "C:\workspace\강의\IPE-Report" "%GDRIVE_TARGET%" /E /XD .git __pycache__ .pytest_cache node_modules .venv .vscode .idea /XF *.pyc *.pyo *.lock *.tmp *.swp *.bak ~$* /R:2 /W:2 /NP /NFL /NDL
 
 echo.
 echo ========================================================
